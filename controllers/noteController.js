@@ -1,23 +1,9 @@
 const Note = require("../models/Note");
-const path = require("path");
-const fs = require("fs");
 
-// ==========================
-// GET USER NOTES (with optional filters)
+// Return notes for a user (simple)
 exports.getUserNotes = async (userId, filters = {}) => {
-  try {
-    const query = { user: userId };
-
-    if (filters.category && filters.category !== "All") query.category = filters.category;
-    if (filters.tag) query.tags = { $regex: filters.tag, $options: "i" };
-    if (filters.revised !== undefined) query.revised = filters.revised;
-
-    const notes = await Note.find(query).sort({ createdAt: -1 });
-    return notes;
-  } catch (err) {
-    console.error("❌ Error fetching notes:", err);
-    return [];
-  }
+  const q = { user: userId, ...filters };
+  return await Note.find(q).sort({ updatedAt: -1, createdAt: -1 }).lean();
 };
 
 // ==========================

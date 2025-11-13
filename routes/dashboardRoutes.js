@@ -3,15 +3,19 @@ const router = express.Router();
 const { ensureAuth } = require("../middleware/authMiddleware");
 const { getUserNotes } = require("../controllers/noteController");
 
-// ✅ Dashboard page (protected)
+// DASHBOARD
 router.get("/", ensureAuth, async (req, res) => {
   try {
-    const username = req.session.username || "Guest";
     const notes = await getUserNotes(req.session.userId);
-    res.render("dashboard", { username, notes });
+    const username = req.session.username || "User";
+    // compute progress for UI
+    const total = notes.length;
+    const revised = notes.filter(n => n.revised).length;
+    res.render("dashboard", { notes, username, total, revised });
   } catch (err) {
-    console.error("Error loading dashboard:", err);
-    res.render("dashboard", { username: req.session.username || "Guest", notes: [] });
+    console.error(err);
+    req.session.error_msg = "Failed to load dashboard";
+    res.redirect("/login");
   }
 });
 
