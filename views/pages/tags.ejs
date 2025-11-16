@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head><title>Tags — StudyBuddy</title><link href="/css/styles.css" rel="stylesheet" /></head>
+  <body>
+    <%- include('../partials/header') %>
+    <main class="app-shell">
+      <section class="app-grid">
+        <%- include('../partials/sidebar') %>
+        <div class="main-card">
+          <h2>Tags</h2>
+          <p class="text-muted">Click a tag to filter notes.</p>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+            <% (tags || []).forEach(tag => { %>
+              <form action="/dashboard" method="GET" style="display:inline">
+                <input type="hidden" name="tag" value="<%= tag %>" />
+                <button class="btn btn-ghost btn-sm" type="submit"><%= tag %></button>
+              </form>
+            <% }) %>
+          </div>
+
+          <hr/>
+          <form action="/tags" method="POST" style="margin-top:12px">
+            <label class="form-label">Add tag</label>
+            <div style="display:flex;gap:8px">
+              <input name="tag" class="form-control" placeholder="New tag" required />
+              <button class="btn btn-primary">Add</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+    <%- include('../partials/footer') %>
+  </body>
+</html>

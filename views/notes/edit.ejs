@@ -7,58 +7,80 @@
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
   <body>
-    <nav class="navbar">
-      <div class="container d-flex justify-content-between align-items-center">
-        <a class="navbar-brand" href="/dashboard">
-          <span class="brand-logo">SB</span>
-          <span>StudyBuddy</span>
-        </a>
+    <%- include('../partials/header') %>
 
-        <div class="nav-right">
-          <% if (username) { %><span class="username">Hi, <%= username %></span><% } %>
-          <a class="btn btn-outline-light" href="/profile">Profile</a>
-          <a class="btn btn-primary" href="/logout">Logout</a>
-        </div>
-      </div>
-    </nav>
+    <main class="app-shell">
+      <section class="app-grid">
+        <%- include('../partials/sidebar') %>
 
-    <div class="container my-4">
-      <% if (success_msg) { %>
-        <div class="alert alert-success"><%= success_msg %></div>
-      <% } %>
-      <% if (error_msg) { %>
-        <div class="alert alert-danger"><%= error_msg %></div>
-      <% } %>
+        <div class="main-card">
+          <% if (success_msg) { %>
+            <div class="toast toast-success mb-2"><%= success_msg %></div>
+          <% } %>
+          <% if (error_msg) { %>
+            <div class="toast toast-error mb-2"><%= error_msg %></div>
+          <% } %>
 
-      <div class="card note-card">
-        <div class="card-body">
-          <h4>Edit Note</h4>
-          <form action="/notes/form/update/<%= note._id %>" method="POST">
-            <div class="mb-3">
-              <label class="form-label">Title</label>
-              <input name="title" class="form-control" value="<%= note.title %>" required />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Content</label>
-              <textarea name="content" class="form-control" rows="8"><%= note.content %></textarea>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Category</label>
-              <input name="category" class="form-control" value="<%= note.category %>" />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Tags (comma separated)</label>
-              <input name="tags" class="form-control" value="<%= (note.tags || []).join(', ') %>" />
+          <h2>Edit Note</h2>
+
+          <form id="noteEditForm" action="/notes/form/update/<%= note._id %>" method="POST">
+            <label class="form-label">Title</label>
+            <input name="title" class="form-control mb-2" value="<%= note.title %>" required />
+
+            <label class="form-label">Content</label>
+            <textarea name="content" class="form-control mb-2" rows="8"><%= note.content %></textarea>
+
+            <label class="form-label">Tags (choose or add)</label>
+            <select id="editTagSelect" multiple class="form-control mb-2" style="min-height:80px">
+              <% (userTags || []).forEach(t => { %>
+                <option value="<%= t %>" <%= (note.tags || []).includes(t) ? 'selected' : '' %>><%= t %></option>
+              <% }) %>
+            </select>
+
+            <div style="display:flex;gap:8px;margin-bottom:12px">
+              <input id="editNewTag" class="form-control" placeholder="Add a new tag" />
+              <button id="editAddTagBtn" type="button" class="btn btn-ghost btn-sm">Add</button>
             </div>
 
-            <div class="d-flex gap-2">
+            <input type="hidden" name="tags" id="editTagsField" value="" />
+
+            <div style="display:flex;gap:8px">
               <button class="btn btn-primary">Save changes</button>
-              <a href="/dashboard" class="btn btn-outline-secondary">Cancel</a>
+              <a href="/dashboard" class="btn btn-ghost">Cancel</a>
             </div>
           </form>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const addBtn = document.getElementById('editAddTagBtn');
+        const newTag = document.getElementById('editNewTag');
+        const tagSelect = document.getElementById('editTagSelect');
+        const tagsField = document.getElementById('editTagsField');
+        const form = document.getElementById('noteEditForm');
+
+        addBtn.addEventListener('click', () => {
+          const v = (newTag.value || '').trim();
+          if (!v) return;
+          if (![...tagSelect.options].some(o=>o.value.toLowerCase()===v.toLowerCase())) {
+            const opt = document.createElement('option'); opt.value = v; opt.text = v; opt.selected = true;
+            tagSelect.appendChild(opt);
+          } else {
+            [...tagSelect.options].forEach(o => { if (o.value.toLowerCase()===v.toLowerCase()) o.selected = true; });
+          }
+          newTag.value = '';
+        });
+
+        form.addEventListener('submit', () => {
+          const selected = [...tagSelect.selectedOptions].map(o => o.value.trim()).filter(Boolean);
+          tagsField.value = selected.join(',');
+        });
+      });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </body>

@@ -1,0 +1,21 @@
+<nav class="navbar app-shell">
+  <a href="/dashboard" class="brand" aria-label="StudyBuddy home">
+    <span class="brand-logo" aria-hidden="true">SB</span>
+    <span class="brand-title">StudyBuddy</span>
+  </a>
+
+  <form action="/dashboard" method="GET" style="flex:1;max-width:560px;margin:0 18px;">
+    <input name="q" class="form-control" placeholder="Search notes, tags or content..." style="width:100%;border-radius:10px;padding:10px 14px" />
+  </form>
+
+  <div class="nav-actions">
+    <% if (username) { %>
+      <div class="text-muted" style="margin-right:8px">Hi, <strong><%= username %></strong></div>
+      <a class="btn btn-ghost btn-sm" href="/profile">Profile</a>
+      <a class="btn btn-primary btn-sm" href="/logout">Logout</a>
+    <% } else { %>
+      <a class="btn btn-ghost btn-sm" href="/login">Login</a>
+      <a class="btn btn-primary btn-sm" href="/register">Register</a>
+    <% } %>
+  </div>
+</nav>

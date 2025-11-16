@@ -5,98 +5,163 @@
   --white:        #FFFFFF;
   --text-gray:    #1F2937;
   --muted:        #6B7280;
+  --accent:       #F59E0B;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --shadow-sm: 0 6px 20px rgba(15,23,42,0.06);
+  --shadow-md: 0 18px 40px rgba(15,23,42,0.09);
+  --glass: rgba(255,255,255,0.88);
+
+  --space-xs: 6px;
+  --space-sm: 12px;
+  --space-md: 18px;
+  --space-lg: 28px;
+
+  --max-width: 1120px;
 }
 
-/* Reset / base */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
 *{box-sizing:border-box}
+html,body{height:100%}
 body{
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
   margin:0;
-  background: linear-gradient(180deg, var(--light-blue) 0%, #F8FAFF 100%);
-  color: var(--text-gray);
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-size:14px;
+  color:var(--text-gray);
+  background: linear-gradient(180deg,var(--light-blue), #F8FAFF);
   -webkit-font-smoothing:antialiased;
 }
 
+/* Layout wrapper */
+.app-shell { max-width:var(--max-width); margin: 28px auto; padding: 0 20px; }
+
 /* Navbar */
 .navbar{
-  background: var(--dark-blue);
-  padding: .75rem 1rem;
-  box-shadow: 0 6px 20px rgba(30,58,138,0.12);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 0;
 }
-.navbar .navbar-brand{
-  color: var(--white);
-  font-weight:700;
-  display:flex;
-  align-items:center;
-  gap:.6rem;
-  text-decoration:none;
+.navbar .brand{
+  display:flex; align-items:center; gap:12px; text-decoration:none;
 }
 .brand-logo{
-  width:36px;
-  height:36px;
-  border-radius:10px;
-  background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--white);
-  font-weight:700;
+  width:46px; height:46px; border-radius:12px;
+  background: linear-gradient(135deg,var(--primary-blue),var(--dark-blue));
+  display:inline-flex; align-items:center; justify-content:center; color:var(--white); font-weight:800;
+  box-shadow: var(--shadow-sm);
   font-size:18px;
-  box-shadow: 0 6px 18px rgba(30,58,138,0.18);
 }
+.brand-title{ color:var(--dark-blue); font-weight:700; font-size:18px; letter-spacing:0.2px; }
 
-/* Navbar right */
-.navbar .nav-right { display:flex; gap:.5rem; align-items:center; }
-.navbar .username { color: rgba(255,255,255,0.95); font-weight:600; margin-right:.5rem; }
+/* Top-right actions */
+.nav-actions{ display:flex; gap:10px; align-items:center; }
 
-/* Container width */
-.container{ max-width:1100px; margin:0 auto; padding:1rem; }
+/* Sidebar (desktop) */
+.app-grid{ display:grid; grid-template-columns: 260px 1fr; gap:24px; align-items:start; }
+@media (max-width:900px){ .app-grid{ grid-template-columns: 1fr; } }
 
-/* Cards / Notes */
+/* Sidebar card */
+.sidebar{
+  background:var(--white); border-radius:var(--radius-md); padding:16px; box-shadow:var(--shadow-sm);
+  height:fit-content;
+}
+.sidebar .section-title{ font-weight:700; color:var(--dark-blue); margin-bottom:10px; }
+.sidebar a{ display:block; padding:8px 10px; color:var(--text-gray); border-radius:8px; text-decoration:none; margin-bottom:6px; }
+.sidebar a:hover{ background:#F1F8FF; color:var(--dark-blue); }
+
+/* Main content */
+.main-card{ background:var(--white); border-radius:var(--radius-md); padding:18px; box-shadow:var(--shadow-md); }
+
+/* Header area inside content */
+.content-header{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px; }
+.content-title{ font-size:20px; font-weight:700; color:var(--dark-blue); }
+
+/* Notes grid & cards */
+.notes-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:16px; }
+@media (max-width:900px){ .notes-grid{ grid-template-columns: 1fr; } }
+
 .note-card{
-  border-radius:12px;
-  border: none;
-  transition: transform .12s ease, box-shadow .12s ease;
-  overflow:hidden;
+  background: linear-gradient(180deg, var(--white), rgba(250,250,255,0.95));
+  border-radius:12px; padding:14px; box-shadow: var(--shadow-sm); transition: transform .12s ease, box-shadow .12s ease;
 }
-.note-card:hover{ transform: translateY(-6px); box-shadow: 0 20px 40px rgba(15,23,42,0.08); }
+.note-card:hover{ transform: translateY(-6px); box-shadow: 0 26px 60px rgba(15,23,42,0.10); }
+.note-title{ font-weight:700; color:var(--dark-blue); margin-bottom:6px; }
+.note-body{ color:#374151; font-size:13px; line-height:1.45; max-height:6.5rem; overflow:hidden; }
 
-.card-body { padding:1.25rem; }
-.card-title { color: var(--text-gray); font-weight:700; }
-.note-content { color:#374151; max-height:6.25rem; overflow:hidden; }
-
-/* Badges and buttons */
-.badge-custom {
-  background: rgba(255,255,255,0.9);
-  color: var(--dark-blue);
-  border-radius:8px;
-  padding:.3rem .6rem;
-  font-weight:600;
-  border: 1px solid rgba(30,58,138,0.06);
+/* Buttons */
+.btn{
+  display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:10px; cursor:pointer; border:none;
 }
-.btn-primary{
-  background: var(--primary-blue);
-  border: none;
-  color: var(--white);
+.btn-primary{ background:var(--primary-blue); color:var(--white); box-shadow: 0 8px 24px rgba(59,130,246,0.14); }
+.btn-ghost{ background:transparent; border:1px solid rgba(30,58,138,0.06); color:var(--dark-blue); }
+.btn-sm{ padding:6px 10px; font-size:13px; border-radius:8px; }
+
+/* Form fields */
+.form-control{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(15,23,42,0.06); background: #fff; }
+
+/* Footer */
+.app-footer{
+  margin-top:28px; padding:18px 0; display:flex; justify-content:space-between; align-items:center;
+  border-top:1px solid rgba(15,23,42,0.04); color:var(--muted);
 }
-.btn-primary:hover{ background: #2563EB; }
+.app-footer a{ color:var(--dark-blue); text-decoration:none; font-weight:600; }
 
-/* Forms */
-input.form-control, textarea.form-control{
-  border-radius:8px; box-shadow:none; border:1px solid rgba(15,23,42,0.06);
-  padding:.6rem .75rem;
+/* subtle animations */
+.fade-in{ animation: fadeIn .28s ease both; }
+@keyframes fadeIn { from{opacity:0; transform: translateY(6px);} to{opacity:1; transform:none;} }
+
+/* small helpers */
+.mt-1{ margin-top:8px; }
+.mb-2{ margin-bottom:12px; }
+.text-muted{ color:var(--muted); font-size:13px; }
+
+/* Toast / alerts */
+.toast{ padding:10px 14px; border-radius:10px; box-shadow: var(--shadow-sm); }
+.toast-success{ background: #ECFDF5; color: #064E3B; }
+.toast-error{ background: #FEF2F2; color: #7F1D1D; }
+
+/* make images and attachments responsive */
+.note-attachments img{ max-width:100%; border-radius:8px; display:block; }
+
+/* small screen tweaks */
+@media (max-width:480px){
+  .brand-title{ font-size:16px; }
+  .notes-grid{ gap:12px; }
 }
 
-/* Progress */
-.progress { height:12px; background: rgba(30,58,138,0.06); border-radius:10px; }
-.progress-bar { background: linear-gradient(90deg,var(--primary-blue),var(--dark-blue)); }
-
-/* Helpers */
-.text-muted { color: var(--muted) !important; }
-.alert { border-radius:10px; box-shadow: 0 8px 24px rgba(15,23,42,0.04); }
-
-/* Responsive tweaks */
-@media (max-width:767px){
-  .note-content{ max-height:9rem; }
-  .navbar .username{ display:none; }
+/* ensure footer sits at bottom of viewport and pages grow */
+html, body {
+  height: 100%;
 }
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* main app shell should expand to push footer down */
+.app-shell {
+  flex: 1 0 auto;
+}
+
+/* make footer relative (no overlap) */
+.app-footer {
+  flex-shrink: 0;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+/* add near the end of file */
+.dark-mode, .dark-mode body {
+  background: linear-gradient(180deg,#071431,#051029) !important;
+  color: #E6EEF8;
+}
+.dark-mode .main-card, .dark-mode .sidebar, .dark-mode .note-card, .dark-mode .auth-card {
+  background: #071430; color: #E6EEF8; border: 1px solid rgba(255,255,255,0.04);
+}
+.dark-mode .text-muted { color: rgba(230,238,248,0.6); }
+.dark-mode .btn-primary { background: #2563eb; box-shadow: 0 8px 24px rgba(37,99,235,0.12); }

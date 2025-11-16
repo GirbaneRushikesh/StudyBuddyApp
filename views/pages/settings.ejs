@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Settings — StudyBuddy</title>
+    <link href="/css/styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <%- include('../partials/header') %>
+    <main class="app-shell">
+      <section class="app-grid">
+        <%- include('../partials/sidebar') %>
+        <div class="main-card">
+          <h2>Settings</h2>
+          <p class="text-muted">Account and app preferences.</p>
+
+          <form action="/settings" method="POST" style="max-width:560px">
+            <label class="form-label">Display name</label>
+            <input class="form-control mb-2" name="displayName" value="<%= (user && user.displayName) || '' %>" />
+
+            <label class="form-label">Tags (comma separated)</label>
+            <input class="form-control mb-2" name="tags" value="<%= (user && (user.tags||[]).join(', ')) || '' %>" />
+
+            <label class="form-label">Theme</label>
+            <div class="mb-3">
+              <label style="margin-right:12px"><input type="radio" name="theme" value="light" <%= (user && user.settings && user.settings.theme==='light') ? 'checked' : '' %> /> Light</label>
+              <label><input type="radio" name="theme" value="dark" <%= (user && user.settings && user.settings.theme==='dark') ? 'checked' : '' %> /> Dark</label>
+            </div>
+
+            <button class="btn btn-primary">Save changes</button>
+          </form>
+        </div>
+      </section>
+    </main>
+    <%- include('../partials/footer') %>
+
+    <script>
+      // server exposes res.locals.theme; apply it if set
+      (function(){
+        const theme = '<%= (typeof theme !== "undefined" ? theme : (user && user.settings && user.settings.theme) || "light") %>';
+        if (theme === 'dark') document.documentElement.classList.add('dark-mode');
+      })();
+    </script>
+  </body>
+</html>
