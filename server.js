@@ -9,7 +9,14 @@ const express = require("express");
 const path = require("path");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
-const User = require("./models/User");
+// const User = require("./models/User");   <-- REMOVE this line
+let User;
+try {
+  User = require("./models/User");
+} catch (err) {
+  User = null;
+  console.warn("models/User not found or wrong-case on this system:", err.message || err);
+}
 
 const app = express();
 
@@ -34,7 +41,7 @@ app.use(
   })
 );
 
-// Simple session-flash middleware: move any messages into res.locals and clear them
+// Flash / locals
 app.use((req, res, next) => {
   res.locals.success_msg = req.session.success_msg || null;
   res.locals.error_msg = req.session.error_msg || null;
@@ -45,13 +52,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// after session & res.locals population middleware
+// Load user tags into views if logged in
 app.use(async (req, res, next) => {
   try {
-    if (req.session && req.session.userId) {
+    if (req.session && req.session.userId && User) {
       const u = await User.findById(req.session.userId).select("tags displayName").lean();
       res.locals.userTags = (u && u.tags) ? u.tags : [];
-      // keep username consistent with displayName
       if (u && u.displayName) res.locals.username = u.displayName;
       res.locals.user = u || null;
     } else {
@@ -65,21 +71,18 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// Routes
+// Routes (index mounted first)
+app.use("/", require("./routes/index"));
 app.use("/", require("./routes/authRoutes"));
+app.use("/", require("./routes/pagesRoutes"));
 app.use("/dashboard", require("./routes/dashboardRoutes"));
 app.use("/notes", require("./routes/noteRoutes"));
 app.use("/profile", require("./routes/profileRoutes"));
-app.use("/", require("./routes/pagesRoutes"));
 app.use("/", require("./routes/health"));
 
-// 404
+// 404 (last)
 app.use((req, res) => res.status(404).render("404"));
 
 // start
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
-
-// after other app.use(...) calls:
-app.use('/', require('./routes/index'));        // keep
-app.use('/', require('./routes/authRoutes'));   // ensure this line exists
