@@ -79,3 +79,7 @@ app.use((req, res) => res.status(404).render("404"));
 // start
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+// after other app.use(...) calls:
+app.use('/', require('./routes/index'));        // keep
+app.use('/', require('./routes/authRoutes'));   // ensure this line exists
