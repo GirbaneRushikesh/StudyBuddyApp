@@ -1,25 +1,23 @@
 const express = require("express");
 const router = express.Router();
-const { registerUser, loginUser, logoutUser } = require("../controllers/authController");
 
-// Root - redirect to dashboard if logged in, otherwise to login
-router.get("/", (req, res) => {
-  if (req.session && req.session.userId) return res.redirect("/dashboard");
-  return res.redirect("/login");
-});
-
-// render pages
+// Render login page
 router.get("/login", (req, res) => {
-  res.render("login", { error_msg: null, success_msg: null });
+  res.render("login", { title: "Login" });
 });
 
+// Handle login (replace with real auth logic/controllers)
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password)
+    return res.render("login", { error_msg: "Email and password required" });
+  // TODO: real auth -> set req.session.userId, etc.
+  return res.redirect("/dashboard");
+});
+
+// Render register page
 router.get("/register", (req, res) => {
-  res.render("register", { error_msg: null, success_msg: null });
+  res.render("register", { title: "Register" });
 });
-
-// post handlers
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.get("/logout", logoutUser);
 
 module.exports = router;

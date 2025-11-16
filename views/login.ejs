@@ -10,39 +10,25 @@
   <body>
     <%- include('partials/header') %>
 
-    <main class="app-shell">
-      <div style="display:flex;justify-content:center;padding:48px 0">
-        <div style="width:420px">
-          <div class="card auth-card">
-            <div class="card-body">
-              <h3 style="color:var(--dark-blue);margin-bottom:6px">Welcome back</h3>
-              <p class="text-muted">Sign in to continue to your notes</p>
-
-              <% if (error_msg) { %><div class="toast toast-error mb-2"><%= error_msg %></div><% } %>
-              <% if (success_msg) { %><div class="toast toast-success mb-2"><%= success_msg %></div><% } %>
-
-              <form action="/login" method="POST">
-                <div class="mb-3">
-                  <label class="form-label">Email</label>
-                  <input name="email" class="form-control" type="email" required />
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Password</label>
-                  <input name="password" class="form-control" type="password" required />
-                </div>
-                <div style="display:flex;gap:10px;align-items:center;margin-top:8px">
-                  <button class="btn btn-primary">Sign in</button>
-                  <a href="/register" class="btn btn-ghost">Create account</a>
-                </div>
-              </form>
+    <main class="app-shell" style="display:flex;justify-content:center;padding:48px 0">
+      <div style="width:420px">
+        <div class="main-card">
+          <h3>Sign in</h3>
+          <% if (error_msg) { %><div class="toast toast-error"><%= error_msg %></div><% } %>
+          <form action="/login" method="POST">
+            <label>Email</label>
+            <input name="email" class="form-control mb-2" type="email" required />
+            <label>Password</label>
+            <input name="password" class="form-control mb-2" type="password" required />
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-primary">Sign in</button>
+              <a class="btn btn-ghost" href="/register">Register</a>
             </div>
-          </div>
+          </form>
         </div>
       </div>
-
-      <%- include('partials/footer') %>
     </main>
 
-    <script src="/js/ui.js"></script>
+    <%- include('partials/footer') %>
   </body>
 </html>
