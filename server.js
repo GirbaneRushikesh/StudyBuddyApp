@@ -1,29 +1,40 @@
-// load env first
 require('dotenv').config();
 
-// connect DB early
+const express = require('express');
+const path = require('path');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const connectDB = require('./config/db');
-connectDB();
 
-const express = require("express");
-const path = require("path");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
-const User = require("./models/User");
+// connect to MongoDB (async)
+connectDB().catch(err => {
+  console.error('Failed to connect to DB at startup:', err);
+  process.exit(1);
+});
 
 const app = express();
 
-// Middlewares
+// safe require for User model (helpful on deploy if file casing differs)
+let User;
+try {
+  User = require('./models/User');
+} catch (err) {
+  // helpful debug output — keeps behavior same on Windows and Linux
+  console.error('Failed to load ./models/User. files in models/:', require('fs').readdirSync(path.join(__dirname, 'models')));
+  throw err;
+}
+
+// view engine & static
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// body parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
 
-// View engine
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
-
-// Session
-const sessionSecret = process.env.SESSION_SECRET || "change_this_secret";
+// session (uses Mongo store)
+const sessionSecret = process.env.SESSION_SECRET || 'change_this_secret';
 app.use(
   session({
     secret: sessionSecret,
@@ -34,48 +45,24 @@ app.use(
   })
 );
 
-// Simple session-flash middleware: move any messages into res.locals and clear them
+// expose common locals
 app.use((req, res, next) => {
-  res.locals.success_msg = req.session.success_msg || null;
-  res.locals.error_msg = req.session.error_msg || null;
   res.locals.username = req.session.username || null;
   res.locals.theme = req.session.theme || null;
+  res.locals.success_msg = req.session.success_msg || null;
+  res.locals.error_msg = req.session.error_msg || null;
   delete req.session.success_msg;
   delete req.session.error_msg;
   next();
 });
 
-// after session & res.locals population middleware
-app.use(async (req, res, next) => {
-  try {
-    if (req.session && req.session.userId) {
-      const u = await User.findById(req.session.userId).select("tags displayName").lean();
-      res.locals.userTags = (u && u.tags) ? u.tags : [];
-      // keep username consistent with displayName
-      if (u && u.displayName) res.locals.username = u.displayName;
-      res.locals.user = u || null;
-    } else {
-      res.locals.userTags = [];
-      res.locals.user = null;
-    }
-  } catch (err) {
-    console.error("user-loader:", err);
-    res.locals.userTags = res.locals.userTags || [];
-  }
-  next();
-});
+// register routes (adjust as needed)
+app.use('/', require('./routes/index'));
+// example: app.use('/notes', require('./routes/notes'));
 
-// Routes
-app.use("/", require("./routes/authRoutes"));
-app.use("/dashboard", require("./routes/dashboardRoutes"));
-app.use("/notes", require("./routes/noteRoutes"));
-app.use("/profile", require("./routes/profileRoutes"));
-app.use("/", require("./routes/pagesRoutes"));
-app.use("/", require("./routes/health"));
+// simple health route
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
-// 404
-app.use((req, res) => res.status(404).render("404"));
-
-// start
+// start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
