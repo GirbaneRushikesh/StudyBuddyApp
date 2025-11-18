@@ -1,16 +1,29 @@
 const express = require('express');
 const router = express.Router();
 
+// Import controller functions
+const { registerUser, loginUser, logoutUser } = require('../controllers/authController');
+
+// -------------------- REGISTER ROUTES -------------------- //
+
+// Render register page
+router.get('/register', (req, res) => {
+  res.render('register', { title: 'Register' });
+});
+
+// Handle register form
+router.post('/register', registerUser);
+
+// -------------------- LOGIN ROUTES -------------------- //
+
 router.get('/login', (req, res) => {
   res.render('login', { title: 'Login' });
 });
 
-router.post('/login', async (req, res) => {
-  // existing login logic or placeholder
-  const { email, password } = req.body;
-  if (!email || !password) return res.render('login', { error_msg: 'Email and password required' });
-  // auth -> set session -> redirect
-  res.redirect('/dashboard');
-});
+router.post('/login', loginUser);
+
+// -------------------- LOGOUT -------------------- //
+
+router.get('/logout', logoutUser);
 
 module.exports = router;
